@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Media Pembelajaran Interaktif - Sahabat Sejati</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    
+    /* Custom scrollbar hide for tab nav */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Keyframes for smooth animations */
+    @keyframes pulse-slow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 2s infinite ease-in-out;
+    }
+
+    @keyframes bounce-subtle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .animate-bounce-subtle {
+      animation: bounce-subtle 1.5s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-sky-100 via-amber-50 to-purple-100 text-slate-800 min-h-screen flex flex-col justify-between pb-12">
+
+  <!-- HEADER & NAVBAR -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-md border-b-4 border-yellow-400">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-yellow-400 p-2.5 rounded-2xl shadow-inner transform hover:rotate-6 transition-transform">
+          <i class="fa-solid fa-wand-magic-sparkles text-2xl text-amber-900"></i>
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-black text-sky-700 tracking-wide flex items-center gap-2">
+            Sahabat Sejati 🤝
+          </h1>
+          <p class="text-xs font-bold text-amber-600">Pendidikan Agama Kristen - Kelas 2 SD</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <!-- Bintang Counter -->
+        <div class="bg-amber-100 border-2 border-amber-300 px-3 py-1.5 rounded-full flex items-center space-x-2 shadow-sm">
+          <i class="fa-solid fa-star text-yellow-500 text-lg animate-pulse"></i>
+          <span id="total-stars-count" class="font-extrabold text-amber-800 text-lg">0</span>
+        </div>
+
+        <!-- Toggle Suara -->
+        <button id="btn-toggle-sound" onclick="toggleSound()" class="p-2.5 rounded-full border-2 transition-all bg-emerald-100 border-emerald-400 text-emerald-700" title="Toggle Suara">
+          <i id="icon-sound" class="fa-solid fa-volume-high text-base"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- TABS NAVIGASI -->
+    <nav class="max-w-5xl mx-auto px-2 flex justify-around sm:justify-center sm:space-x-3 py-2 overflow-x-auto no-scrollbar">
+      <button onclick="switchTab('cerita')" id="tab-btn-cerita" class="tab-button px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all border-2 flex items-center gap-1.5 bg-sky-500 text-white shadow-md border-sky-600">
+        <i class="fa-solid fa-book-open"></i> Cerita
+      </button>
+      <button onclick="switchTab('game1')" id="tab-btn-game1" class="tab-button px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all border-2 flex items-center gap-1.5 bg-white text-amber-700 border-amber-400 hover:bg-amber-100">
+        <i class="fa-solid fa-gamepad"></i> Turunkan Atap
+      </button>
+      <button onclick="switchTab('game2')" id="tab-btn-game2" class="tab-button px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all border-2 flex items-center gap-1.5 bg-white text-emerald-700 border-emerald-400 hover:bg-emerald-100">
+        <i class="fa-solid fa-puzzle-piece"></i> Cari Teman
+      </button>
+      <button onclick="switchTab('kuis')" id="tab-btn-kuis" class="tab-button px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all border-2 flex items-center gap-1.5 bg-white text-purple-700 border-purple-400 hover:bg-purple-100">
+        <i class="fa-solid fa-pen-to-square"></i> Kuis Seru
+      </button>
+      <button onclick="switchTab('afirmasi')" id="tab-btn-afirmasi" class="tab-button px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all border-2 flex items-center gap-1.5 bg-white text-rose-700 border-rose-400 hover:bg-rose-100">
+        <i class="fa-solid fa-heart"></i> Doa & Janji
+      </button>
+    </nav>
+  </header>
+
+  <!-- CONTAINER UTAMA -->
+  <main class="max-w-4xl mx-auto px-4 mt-6 flex-grow w-full">
+
+    <!-- TAB 1: CERITA -->
+    <section id="tab-cerita" class="tab-content block">
+      <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-sky-200">
+        <div class="flex items-center justify-between mb-4 pb-2 border-b-2 border-slate-100">
+          <div>
+            <h2 id="story-title" class="text-xl font-black text-sky-800">Ayat Hafalan Hari Ini 📜</h2>
+            <span id="story-subtitle" class="text-xs font-bold text-sky-600"></span>
+          </div>
+          <span id="story-page-indicator" class="text-xs font-black bg-sky-100 text-sky-700 px-3 py-1 rounded-full">
+            Halaman 1 / 3
+          </span>
+        </div>
+
+        <div id="story-body" class="min-h-[260px] flex flex-col justify-center">
+          <!-- Story Content Loaded via JS -->
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="flex items-center justify-between mt-6 pt-4 border-t-2 border-slate-100">
+          <button id="btn-prev-story" onclick="changeStoryPage(-1)" class="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm bg-slate-100 text-slate-400 cursor-not-allowed" disabled>
+            <i class="fa-solid fa-chevron-left"></i> Sebelum
+          </button>
+
+          <div id="story-dots" class="flex space-x-2">
+            <!-- Dots added by JS -->
+          </div>
+
+          <button id="btn-next-story" onclick="changeStoryPage(1)" class="flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm bg-sky-500 text-white hover:bg-sky-600 shadow">
+            Berikut <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: MINI GAME ATAP -->
+    <section id="tab-game1" class="tab-content hidden">
+      <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-amber-300">
+        <div class="text-center mb-4">
+          <h2 class="text-2xl font-black text-amber-900 flex items-center justify-center gap-2">
+            🎮 Misi Sahabat: Turunkan Tempat Tidur!
+          </h2>
+          <p class="text-xs text-amber-700 font-bold mt-1">
+            Bantu 4 sahabat menurunkan teman yang lumpuh tepat di depan Yesus dengan menjawab pertanyaan!
+          </p>
+        </div>
+
+        <!-- Game 1 Screen: Start -->
+        <div id="g1-screen-start" class="text-center py-8 space-y-4">
+          <div class="bg-amber-50 p-6 rounded-3xl border-2 border-amber-200 max-w-md mx-auto">
+            <span class="text-5xl block mb-2">🪜</span>
+            <h3 class="font-extrabold text-amber-900 text-lg">Siap Membantu Teman?</h3>
+            <p class="text-xs text-amber-800 mt-2 leading-relaxed">
+              Setiap jawaban yang benar akan mengulur tali tempat tidur semakin turun ke bawah hingga sampai kepada Yesus.
+            </p>
+            <button onclick="startGame1()" class="mt-6 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white text-base font-black rounded-full shadow-lg transform hover:scale-105 transition-all">
+              Mulai Permainan 🚀
+            </button>
+          </div>
+        </div>
+
+        <!-- Game 1 Screen: Playing -->
+        <div id="g1-screen-play" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+          <!-- Canvas Animation View -->
+          <div class="bg-gradient-to-b from-sky-200 via-amber-100 to-amber-200 p-4 rounded-3xl border-4 border-amber-400 relative overflow-hidden h-72 flex flex-col justify-between items-center shadow-inner">
+            <!-- Top Roof -->
+            <div class="w-full bg-amber-700 h-8 rounded-t-xl flex justify-center items-center relative border-b-4 border-amber-900">
+              <span class="text-xs text-white font-black">ATAP RUMAH KAPERNAUM</span>
+              <div class="absolute top-1 bg-amber-950 w-24 h-6 rounded-full border border-amber-600"></div>
+            </div>
+
+            <!-- Rope & Bed Container -->
+            <div id="g1-bed-container" class="w-full flex flex-col items-center transition-all duration-700 ease-out" style="transform: translateY(0px);">
+              <div class="flex justify-between w-32 h-16 border-x-4 border-amber-800 border-dashed"></div>
+              <div class="bg-sky-500 text-white font-black text-xs px-4 py-2 rounded-2xl shadow-lg border-2 border-white flex items-center space-x-2 animate-bounce-subtle">
+                <span>🛏️</span>
+                <span>Teman Lumpuh</span>
+              </div>
+            </div>
+
+            <!-- Bottom: Jesus -->
+            <div class="w-full bg-emerald-600/30 p-2 rounded-b-xl flex flex-col items-center border-t-2 border-emerald-400">
+              <div class="bg-white px-3 py-1 rounded-full border border-yellow-400 shadow text-xs font-black text-amber-800 flex items-center gap-1">
+                <span>✨</span> Tuhan Yesus Menyembuhkan
+              </div>
+            </div>
+          </div>
+
+          <!-- Question Box -->
+          <div class="space-y-4">
+            <div class="bg-amber-50 p-4 rounded-2xl border-2 border-amber-300">
+              <span id="g1-q-counter" class="text-xs font-black bg-amber-200 text-amber-800 px-2.5 py-1 rounded-full">
+                Pertanyaan 1 dari 3
+              </span>
+              <h4 id="g1-q-title" class="font-extrabold text-amber-950 text-base mt-2">
+                <!-- Question Text -->
+              </h4>
+            </div>
+
+            <div id="g1-q-options" class="space-y-2">
+              <!-- Options inserted by JS -->
+            </div>
+
+            <div id="g1-q-hint" class="text-xs text-amber-700 italic bg-white p-2.5 rounded-xl border border-amber-100">
+              💡 Petunjuk: -
+            </div>
+          </div>
+        </div>
+
+        <!-- Game 1 Screen: Won -->
+        <div id="g1-screen-win" class="hidden text-center py-6 space-y-4">
+          <div class="bg-emerald-50 p-6 rounded-3xl border-4 border-emerald-300 max-w-md mx-auto shadow-lg">
+            <div class="text-6xl mb-2">🎉✨</div>
+            <h3 class="text-2xl font-black text-emerald-900">HEBAT SEKALI!</h3>
+            <p class="text-xs font-bold text-emerald-800 mt-2 leading-relaxed">
+              Kamu berhasil membantu 4 sahabat menurunkan teman mereka! Yesus menyembuhkan si lumpuh dan dia dapat berjalan kembali dengan sukacita!
+            </p>
+            <div class="mt-4 inline-flex items-center space-x-2 bg-yellow-300 border-2 border-yellow-500 px-4 py-2 rounded-full font-black text-amber-900 text-sm">
+              <i class="fa-solid fa-star text-amber-700"></i>
+              <span>+3 Bintang Sahabat Diterima!</span>
+            </div>
+            <br />
+            <button onclick="startGame1()" class="mt-6 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-black text-sm shadow inline-flex items-center gap-2">
+              <i class="fa-solid fa-rotate-right"></i> Main Lagi
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: MINI GAME MATCHING -->
+    <section id="tab-game2" class="tab-content hidden">
+      <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-emerald-300">
+        <div class="text-center mb-6">
+          <h2 class="text-2xl font-black text-emerald-900 flex items-center justify-center gap-2">
+            🧩 Pilih Perbuatan Sahabat Sejati
+          </h2>
+          <p class="text-xs text-emerald-700 font-bold mt-1">
+            Pilih sikap anak Tuhan yang benar untuk setiap situasi di bawah ini!
+          </p>
+        </div>
+
+        <div id="game2-container" class="space-y-4">
+          <!-- Rendered dynamically by JS -->
+        </div>
+
+        <div id="game2-success-card" class="hidden mt-6 p-5 bg-gradient-to-r from-emerald-400 to-teal-500 text-white rounded-2xl text-center shadow-lg animate-bounce-subtle">
+          <h3 class="text-xl font-black">Luar Biasa! Kamu Adalah Sahabat yang Baik! 🌟</h3>
+          <p class="text-xs font-bold mt-1">Kamu berhasil memilih semua tindakan penuh kasih!</p>
+          <div class="mt-3 inline-flex items-center space-x-2 bg-white text-emerald-800 px-4 py-1.5 rounded-full font-black text-xs">
+            <i class="fa-solid fa-star text-yellow-500"></i>
+            <span>+3 Bintang Diterima</span>
+          </div>
+          <button onclick="resetGame2()" class="block mx-auto mt-4 px-5 py-2 bg-white text-emerald-700 hover:bg-emerald-50 font-black rounded-full text-xs shadow">
+            Coba Lagi
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: KUIS INTERAKTIF -->
+    <section id="tab-kuis" class="tab-content hidden">
+      <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-purple-300">
+        <!-- Quiz Play Screen -->
+        <div id="quiz-screen-play">
+          <div class="flex items-center justify-between mb-4 pb-2 border-b-2 border-slate-100">
+            <div>
+              <h2 class="text-xl font-black text-purple-900">📝 Kuis Sahabat Sejati</h2>
+              <p class="text-xs font-bold text-purple-600">Jawab pertanyaan berikut dengan teliti!</p>
+            </div>
+            <span id="quiz-progress-text" class="text-xs font-black bg-purple-100 text-purple-700 px-3 py-1.5 rounded-full">
+              Soal 1 / 5
+            </span>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden mb-6">
+            <div id="quiz-progress-bar" class="bg-purple-600 h-full transition-all duration-300" style="width: 20%;"></div>
+          </div>
+
+          <!-- Question Box -->
+          <div class="bg-purple-50/60 p-5 rounded-2xl border-2 border-purple-200 mb-6">
+            <h3 id="quiz-question-text" class="text-base sm:text-lg font-black text-purple-950">
+              <!-- Question Text -->
+            </h3>
+          </div>
+
+          <!-- Options -->
+          <div id="quiz-options-list" class="space-y-3">
+            <!-- Options dynamically generated -->
+          </div>
+
+          <!-- Submit / Next Button -->
+          <div class="mt-6 flex justify-end">
+            <button id="btn-quiz-next" onclick="nextQuizQuestion()" disabled class="px-6 py-3 rounded-full font-black text-sm flex items-center gap-2 transition-all bg-slate-200 text-slate-400 cursor-not-allowed">
+              Pertanyaan Berikutnya ➡️
+            </button>
+          </div>
+        </div>
+
+        <!-- Quiz Result Screen -->
+        <div id="quiz-screen-result" class="hidden text-center py-6 space-y-6">
+          <div class="bg-gradient-to-b from-purple-100 to-amber-50 p-6 rounded-3xl border-4 border-purple-300 shadow-lg max-w-md mx-auto">
+            <i class="fa-solid fa-trophy text-6xl text-yellow-500 animate-bounce-subtle"></i>
+            <h3 class="text-2xl font-black text-purple-900 mt-2">HASIL KUIS KAMU</h3>
+
+            <div class="my-4">
+              <span id="quiz-score-val" class="text-5xl font-black text-purple-700">100</span>
+              <span class="text-sm font-bold text-purple-500"> / 100</span>
+            </div>
+
+            <p id="quiz-score-feedback" class="text-xs font-bold text-slate-600">
+              Sempurna! Kamu memahami firman Tuhan tentang persahabatan dengan sangat baik! 🌟
+            </p>
+
+            <div id="quiz-stars-earned" class="mt-4 inline-flex items-center space-x-2 bg-yellow-300 border-2 border-yellow-500 px-4 py-2 rounded-full font-black text-amber-900 text-xs">
+              <i class="fa-solid fa-star text-amber-700"></i>
+              <span>+10 Bintang Ditambahkan!</span>
+            </div>
+
+            <div class="mt-6">
+              <button onclick="resetQuiz()" class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-full text-xs shadow inline-flex items-center gap-2">
+                <i class="fa-solid fa-rotate-right"></i> Ulangi Kuis
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: DOA & JANJI AFIRMASI -->
+    <section id="tab-afirmasi" class="tab-content hidden">
+      <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-rose-300 space-y-6">
+        <div class="text-center">
+          <h2 class="text-2xl font-black text-rose-900 flex items-center justify-center gap-2">
+            ❤️ Afirmasi & Doa Sahabat
+          </h2>
+          <p class="text-xs text-rose-700 font-bold mt-1">
+            Mari kita berjanji untuk selalu mengasihi dan menolong teman dengan ikhlas.
+          </p>
+        </div>
+
+        <!-- Affirmation Quote -->
+        <div class="bg-gradient-to-r from-rose-100 via-pink-100 to-amber-100 p-6 rounded-3xl border-2 border-rose-300 shadow-sm relative">
+          <span class="text-3xl absolute top-3 left-3">🕊️</span>
+          <span class="text-3xl absolute bottom-3 right-3">✨</span>
+          <h3 class="text-center font-extrabold text-rose-900 text-base mb-3">AFIRMASI ANAK TUHAN</h3>
+          <p class="text-sm font-bold text-rose-800 text-center italic leading-relaxed max-w-xl mx-auto">
+            "Marilah kita selalu mengasihi dan menolong sesama teman, dengan dasar kasih yang tulus, ikhlas, dan tanpa mengharapkan balasan apa pun, karena Tuhan selalu melihat perbuatan baik kita."
+          </p>
+        </div>
+
+        <!-- Interactive Prayer Badge Generator -->
+        <div class="bg-rose-50/70 p-5 rounded-2xl border-2 border-rose-200">
+          <h4 class="font-extrabold text-rose-950 text-sm mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-award text-rose-600"></i> Kartu Janji Sahabat Sejati
+          </h4>
+
+          <div id="badge-form-container">
+            <form onsubmit="handleBadgeSubmit(event)" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-black text-rose-900 mb-1">Nama Kamu:</label>
+                  <input id="input-child-name" type="text" required placeholder="Contoh: Samuel" class="w-full px-3 py-2 text-xs font-bold rounded-xl border-2 border-rose-300 focus:outline-none focus:border-rose-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-black text-rose-900 mb-1">Nama Sahabat Terbaikmu:</label>
+                  <input id="input-friend-name" type="text" required placeholder="Contoh: Maria" class="w-full px-3 py-2 text-xs font-bold rounded-xl border-2 border-rose-300 focus:outline-none focus:border-rose-500">
+                </div>
+              </div>
+
+              <div class="flex items-center space-x-2">
+                <input id="chk-pledge" type="checkbox" onchange="toggleCommitButton()" class="w-4 h-4 text-rose-600 rounded border-rose-300 focus:ring-rose-500">
+                <label for="chk-pledge" class="text-xs font-bold text-slate-700">
+                  Saya berjanji akan mengasihi, mendoakan, dan membantu sahabat saya setiap saat!
+                </label>
+              </div>
+
+              <button id="btn-submit-badge" type="submit" disabled class="w-full py-3 rounded-full font-black text-xs transition-all shadow-md bg-slate-200 text-slate-400 cursor-not-allowed">
+                Simpan Janji & Dapatkan Lencana Sahabat 🎖️
+              </button>
+            </form>
+          </div>
+
+          <!-- Badge Result Display -->
+          <div id="badge-result-container" class="hidden text-center p-6 bg-white rounded-2xl border-4 border-yellow-400 shadow-xl space-y-3">
+            <div class="inline-block bg-yellow-400 p-4 rounded-full shadow-md mb-1">
+              <i class="fa-solid fa-ribbon text-4xl text-amber-900"></i>
+            </div>
+            <h4 class="text-lg font-black text-amber-900">LENCANA SAHABAT SEJATI</h4>
+            <p class="text-xs font-extrabold text-slate-600">
+              Diberikan kepada <span id="res-child-name" class="text-rose-600 font-black"></span> karena berjanji menjadi sahabat yang penuh kasih untuk <span id="res-friend-name" class="text-rose-600 font-black"></span>.
+            </p>
+            <div class="p-3 bg-yellow-50 rounded-xl border border-yellow-200 text-xs italic text-amber-800 font-bold">
+              "Tuhan Yesus selalu melihat setiap perbuatan baik dan kasih tulusmu!"
+            </div>
+            <div class="pt-2">
+              <span class="text-xs font-black bg-rose-100 text-rose-700 px-3 py-1 rounded-full">
+                +5 Bintang Spesial Diterima! ⭐
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-12 text-center text-xs font-bold text-slate-500">
+    <p>Pendidikan Agama Kristen & Budi Pekerti - Kelas 2 SD</p>
+    <p class="mt-1 text-slate-400">Dibuat dengan ❤️ untuk pembelajaran interaktif anak-anak</p>
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // --- STATE MANAGEMENT ---
+    let totalStars = 0;
+    let soundEnabled = true;
+
+    // --- AUDIO SYSTEM (Web Audio API) ---
+    function playSound(type) {
+      if (!soundEnabled) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'correct') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+          osc.frequency.exponentialRampToValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+          osc.frequency.exponentialRampToValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.35);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(250, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.2);
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.25);
+        } else if (type === 'win') {
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.frequency.value = freq;
+            g.gain.setValueAtTime(0.25, ctx.currentTime + idx * 0.1);
+            g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + idx * 0.1 + 0.2);
+            o.start(ctx.currentTime + idx * 0.1);
+            o.stop(ctx.currentTime + idx * 0.1 + 0.25);
+          });
+        } else if (type === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, ctx.currentTime);
+          gain.gain.setValueAtTime(0.15, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.08);
+        }
+      } catch (e) {
+        console.log("Audio not allowed without gesture", e);
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('btn-toggle-sound');
+      const icon = document.getElementById('icon-sound');
+      if (soundEnabled) {
+        btn.className = "p-2.5 rounded-full border-2 transition-all bg-emerald-100 border-emerald-400 text-emerald-700";
+        icon.className = "fa-solid fa-volume-high text-base";
+      } else {
+        btn.className = "p-2.5 rounded-full border-2 transition-all bg-rose-100 border-rose-300 text-rose-600";
+        icon.className = "fa-solid fa-volume-xmark text-base";
+      }
+      playSound('click');
+    }
+
+    function addStars(count) {
+      totalStars += count;
+      document.getElementById('total-stars-count').innerText = totalStars;
+    }
+
+    // --- SPEECH SYNTHESIS (TTS) ---
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'id-ID';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // --- NAVIGATION TABS LOGIC ---
+    function switchTab(tabId) {
+      playSound('click');
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(el => el.classList.add('hidden'));
+
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+      // Update button active states
+      const buttons = document.querySelectorAll('.tab-button');
+      buttons.forEach(btn => {
+        btn.className = "tab-button px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all border-2 flex items-center gap-1.5 bg-white text-slate-700 border-slate-300 hover:bg-slate-100";
+      });
+
+      const activeBtn = document.getElementById('tab-btn-' + tabId);
+      if (tabId === 'cerita') activeBtn.className = "tab-button px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all border-2 flex items-center gap-1.5 bg-sky-500 text-white shadow-md border-sky-600";
+      if (tabId === 'game1') activeBtn.className = "tab-button px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all border-2 flex items-center gap-1.5 bg-amber-500 text-white shadow-md border-amber-600";
+      if (tabId === 'game2') activeBtn.className = "tab-button px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all border-2 flex items-center gap-1.5 bg-emerald-500 text-white shadow-md border-emerald-600";
+      if (tabId === 'kuis') activeBtn.className = "tab-button px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all border-2 flex items-center gap-1.5 bg-purple-600 text-white shadow-md border-purple-700";
+      if (tabId === 'afirmasi') activeBtn.className = "tab-button px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all border-2 flex items-center gap-1.5 bg-rose-500 text-white shadow-md border-rose-600";
+    }
+
+    // --- STORY TAB DATA & LOGIC ---
+    const storyPages = [
+      {
+        title: "Ayat Hafalan Hari Ini 📜",
+        subtitle: "Amsal 17:17",
+        html: `
+          <div class="space-y-4 text-center">
+            <div class="bg-amber-100 border-4 border-amber-300 p-6 rounded-3xl shadow-lg relative">
+              <span class="text-4xl absolute -top-5 left-6">✨</span>
+              <span class="text-4xl absolute -bottom-5 right-6">✨</span>
+              <h3 class="text-lg font-black text-amber-900 mb-2">Amsal 17:17</h3>
+              <p class="text-xl sm:text-2xl font-bold text-amber-800 italic leading-relaxed">
+                "Seorang sahabat menaruh kasih setiap waktu, dan menjadi seorang saudara dalam kesukaran."
+              </p>
+              <button onclick="playSound('click'); speakText('Amsal 17 ayat 17. Seorang sahabat menaruh kasih setiap waktu, dan menjadi seorang saudara dalam kesukaran.');" 
+                class="mt-4 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-full font-bold text-sm shadow inline-flex items-center gap-2">
+                <i class="fa-solid fa-volume-high"></i> Dengarkan Ayat
+              </button>
+            </div>
+
+            <div class="bg-sky-50 p-5 rounded-2xl border-2 border-sky-200 text-left">
+              <h4 class="font-extrabold text-sky-800 text-base mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-users text-sky-600"></i> Manusia Adalah Makhluk Sosial
+              </h4>
+              <p class="text-sm leading-relaxed text-slate-700">
+                Artinya, <strong>kita tidak dapat hidup sendirian</strong>! Di rumah kita butuh Orang Tua dan Saudara. Di sekolah dan lingkungan masyarakat, kita butuh teman-teman yang baik.
+              </p>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Kisah 4 Sahabat & Orang Lumpuh 🏠",
+        subtitle: "(Lukas 5:19-20)",
+        html: `
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+              <div class="bg-gradient-to-b from-sky-200 to-amber-100 p-4 rounded-3xl border-4 border-sky-300 flex flex-col items-center justify-center min-h-[220px]">
+                <svg class="w-48 h-48" viewBox="0 0 200 200">
+                  <polygon points="20,80 100,20 180,80" fill="#d97706" />
+                  <polygon points="40,80 100,35 160,80" fill="#f59e0b" />
+                  <ellipse cx="100" cy="70" rx="35" ry="15" fill="#451a03" />
+                  <line x1="75" y1="70" x2="75" y2="135" stroke="#78350f" stroke-width="3" stroke-dasharray="4 2" />
+                  <line x1="125" y1="70" x2="125" y2="135" stroke="#78350f" stroke-width="3" stroke-dasharray="4 2" />
+                  <rect x="65" y="130" width="70" height="15" rx="5" fill="#3b82f6" />
+                  <circle cx="80" cy="132" r="6" fill="#fca5a5" />
+                  <rect x="85" y="133" width="30" height="7" rx="3" fill="#ef4444" />
+                  <circle cx="100" cy="170" r="10" fill="#fde047" />
+                  <path d="M 90 190 Q 100 175 110 190 Z" fill="#ffffff" stroke="#eab308" stroke-width="2" />
+                </svg>
+                <p class="text-xs font-bold text-amber-900 mt-2 bg-white/80 px-3 py-1 rounded-full">
+                  Menurunkan tempat tidur dari atap rumah!
+                </p>
+              </div>
+
+              <div class="space-y-3 text-sm leading-relaxed text-slate-700">
+                <div class="bg-amber-50 p-3 rounded-xl border border-amber-200">
+                  <span class="font-black text-amber-700">1. Kota Kapernaum:</span> Rumah tempat Yesus mengajar sangat dipenuhi banyak orang. Tidak ada jalan masuk lewat pintu atau jendela!
+                </div>
+                <div class="bg-sky-50 p-3 rounded-xl border border-sky-200">
+                  <span class="font-black text-sky-700">2. Kerja Sama Luar Biasa:</span> Empat orang sahabat tidak menyerah! Mereka memanjat ke atas atap, membongkar genteng, dan menurunkan si sakit lumpuh beserta tempat tidurnya dengan tali.
+                </div>
+                <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+                  <span class="font-black text-emerald-700">3. Yesus Mengagumi Iman Mereka:</span> Yesus berkata, <em>"Hai saudara, dosamu sudah diampuni... Bangunlah, angkatlah tilammu dan pulanglah!"</em>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Pelajaran Penting Untuk Kita 🌟",
+        subtitle: "",
+        html: `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-purple-50 border-2 border-purple-200 p-4 rounded-2xl flex items-start space-x-3">
+              <div class="bg-purple-500 text-white p-2.5 rounded-2xl font-black text-lg">A</div>
+              <div>
+                <h4 class="font-extrabold text-purple-900 text-base">Saling Menolong</h4>
+                <p class="text-xs text-purple-800 mt-1 leading-relaxed">
+                  Tuhan memberikan teman agar kita bisa saling membantu, saling mendoakan saat sakit, menghibur saat sedih, dan belajar bersama.
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-rose-50 border-2 border-rose-200 p-4 rounded-2xl flex items-start space-x-3">
+              <div class="bg-rose-500 text-white p-2.5 rounded-2xl font-black text-lg">B</div>
+              <div>
+                <h4 class="font-extrabold text-rose-900 text-base">Meneladani Yesus</h4>
+                <p class="text-xs text-rose-800 mt-1 leading-relaxed">
+                  Tuhan Yesus adalah Sahabat sejati terbaik kita. Kita dipanggil untuk mengasihi teman tanpa membeda-bedakan agama atau status sosial.
+                </p>
+              </div>
+            </div>
+
+            <div class="col-span-1 sm:col-span-2 bg-yellow-100 border-2 border-yellow-300 p-4 rounded-2xl flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-gift text-2xl text-amber-600"></i>
+                <p class="text-xs sm:text-sm font-bold text-amber-900">
+                  Kehadiran teman adalah bukti nyata bahwa Tuhan memelihara dan menyayangi hidup kita!
+                </p>
+              </div>
+            </div>
+          </div>
+        `
+      }
+    ];
+
+    let currentStoryPage = 0;
+
+    function renderStoryPage() {
+      const p = storyPages[currentStoryPage];
+      document.getElementById('story-title').innerText = p.title;
+      document.getElementById('story-subtitle').innerText = p.subtitle;
+      document.getElementById('story-page-indicator').innerText = `Halaman ${currentStoryPage + 1} / ${storyPages.length}`;
+      document.getElementById('story-body').innerHTML = p.html;
+
+      // Prev/Next buttons
+      const btnPrev = document.getElementById('btn-prev-story');
+      const btnNext = document.getElementById('btn-next-story');
+
+      if (currentStoryPage === 0) {
+        btnPrev.disabled = true;
+        btnPrev.className = "flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm bg-slate-100 text-slate-400 cursor-not-allowed";
+      } else {
+        btnPrev.disabled = false;
+        btnPrev.className = "flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm bg-sky-500 text-white hover:bg-sky-600 shadow";
+      }
+
+      if (currentStoryPage === storyPages.length - 1) {
+        btnNext.disabled = true;
+        btnNext.className = "flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm bg-slate-100 text-slate-400 cursor-not-allowed";
+      } else {
+        btnNext.disabled = false;
+        btnNext.className = "flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm bg-sky-500 text-white hover:bg-sky-600 shadow";
+      }
+
+      // Dots indicator
+      let dotsHtml = '';
+      storyPages.forEach((_, idx) => {
+        dotsHtml += `<div class="h-3 rounded-full transition-all ${idx === currentStoryPage ? 'bg-sky-600 w-6' : 'bg-slate-200 w-3'}"></div>`;
+      });
+      document.getElementById('story-dots').innerHTML = dotsHtml;
+    }
+
+    function changeStoryPage(dir) {
+      playSound('click');
+      currentStoryPage += dir;
+      renderStoryPage();
+    }
+
+    // --- MINI GAME 1 LOGIC ---
+    let g1Step = 0;
+    let g1RopeLength = 0; // 0 to 100
+    const g1Questions = [
+      {
+        question: "Berapa orang sahabat yang bekerja sama membawa orang lumpuh ini?",
+        options: ["2 orang", "4 orang", "10 orang"],
+        correct: 1,
+        hint: "Mereka berempat kompak membawa tilam dari 4 sisi!"
+      },
+      {
+        question: "Mengapa mereka harus membongkar atap rumah?",
+        options: [
+          "Karena pintu & jendela sudah penuh orang",
+          "Karena mereka suka main di atap",
+          "Karena pintu sedang terkunci"
+        ],
+        correct: 0,
+        hint: "Banyak orang berdesakan mendengar ajaran Yesus."
+      },
+      {
+        question: "Apa reaksi Yesus ketika melihat usaha keras 4 sahabat ini?",
+        options: [
+          "Yesus marah karena atap rusak",
+          "Yesus kagum akan iman mereka",
+          "Yesus menyuruh mereka pulang"
+        ],
+        correct: 1,
+        hint: "Yesus melihat kasih & iman yang luar biasa dari para sahabat!"
+      }
+    ];
+
+    function startGame1() {
+      g1Step = 0;
+      g1RopeLength = 0;
+      document.getElementById('g1-screen-start').classList.add('hidden');
+      document.getElementById('g1-screen-win').classList.add('hidden');
+      document.getElementById('g1-screen-play').classList.remove('hidden');
+      renderG1Question();
+    }
+
+    function renderG1Question() {
+      const q = g1Questions[g1Step];
+      document.getElementById('g1-q-counter').innerText = `Pertanyaan ${g1Step + 1} dari 3`;
+      document.getElementById('g1-q-title').innerText = q.question;
+      document.getElementById('g1-q-hint').innerText = `💡 Petunjuk: ${q.hint}`;
+
+      document.getElementById('g1-bed-container').style.transform = `translateY(${g1RopeLength * 1.5}px)`;
+
+      let optsHtml = '';
+      q.options.forEach((opt, idx) => {
+        optsHtml += `
+          <button onclick="answerG1(${idx})" class="w-full text-left p-3.5 bg-white hover:bg-amber-100 border-2 border-amber-200 hover:border-amber-400 rounded-2xl font-bold text-xs sm:text-sm text-slate-800 transition-all shadow-sm flex items-center justify-between group">
+            <span>${opt}</span>
+            <i class="fa-solid fa-chevron-right text-amber-400 group-hover:translate-x-1 transition-transform"></i>
+          </button>
+        `;
+      });
+      document.getElementById('g1-q-options').innerHTML = optsHtml;
+    }
+
+    function answerG1(index) {
+      if (index === g1Questions[g1Step].correct) {
+        playSound('correct');
+        g1RopeLength += 33.3;
+        document.getElementById('g1-bed-container').style.transform = `translateY(${g1RopeLength * 1.5}px)`;
+
+        if (g1Step + 1 < g1Questions.length) {
+          g1Step++;
+          setTimeout(() => {
+            renderG1Question();
+          }, 500);
+        } else {
+          setTimeout(() => {
+            playSound('win');
+            addStars(3);
+            document.getElementById('g1-screen-play').classList.add('hidden');
+            document.getElementById('g1-screen-win').classList.remove('hidden');
+          }, 700);
+        }
+      } else {
+        playSound('wrong');
+      }
+    }
+
+    // --- MINI GAME 2 LOGIC ---
+    const game2Items = [
+      {
+        id: 1,
+        situation: "Teman sedang sakit dirawat di rumah",
+        goodAction: "Menjenguk dan mendoakan kesembuhannya",
+        badAction: "Membiarkan dan meninggalkannya sendirian",
+      },
+      {
+        id: 2,
+        situation: "Teman sedang bersedih atau menangis",
+        goodAction: "Menghibur dan mendengarkan ceritanya",
+        badAction: "Ejek dan tertawa terbahak-bahak",
+      },
+      {
+        id: 3,
+        situation: "Teman kesulitan belajar materi kelas",
+        goodAction: "Belajar bersama dan saling membantu",
+        badAction: "Pelit ilmu dan tidak mau bantu",
+      },
+      {
+        id: 4,
+        situation: "Teman berbeda agama atau suku",
+        goodAction: "Tetap berteman baik dan saling menghormati",
+        badAction: "Jauhi dan hanya berteman yang sama saja",
+      }
+    ];
+
+    let game2Answers = {};
+    let game2Score = 0;
+
+    function renderGame2() {
+      let html = '';
+      game2Items.forEach(item => {
+        const answered = game2Answers[item.id];
+        let goodStyle = "bg-white hover:bg-emerald-100 text-emerald-900 border-emerald-300";
+        let badStyle = "bg-white hover:bg-rose-100 text-rose-900 border-rose-200";
+
+        if (answered === 'good') {
+          goodStyle = "bg-emerald-500 text-white border-emerald-600 shadow";
+        } else if (answered) {
+          goodStyle = "bg-slate-100 text-slate-400 border-slate-200";
+        }
+
+        if (answered === 'bad') {
+          badStyle = "bg-rose-500 text-white border-rose-600 shadow";
+        } else if (answered) {
+          badStyle = "bg-slate-100 text-slate-400 border-slate-200";
+        }
+
+        html += `
+          <div class="bg-emerald-50/60 p-4 rounded-2xl border-2 border-emerald-200 space-y-3">
+            <div class="flex items-center space-x-2">
+              <span class="bg-emerald-500 text-white w-6 h-6 rounded-full flex items-center justify-center font-extrabold text-xs">
+                ${item.id}
+              </span>
+              <h4 class="font-extrabold text-slate-800 text-sm">${item.situation}</h4>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button onclick="handleGame2Select(${item.id}, 'good')" ${answered ? 'disabled' : ''} class="p-3 rounded-xl border-2 text-left text-xs font-bold transition-all flex items-center justify-between ${goodStyle}">
+                <span>${item.goodAction}</span>
+                ${answered === 'good' ? '<i class="fa-solid fa-circle-check text-white"></i>' : ''}
+              </button>
+
+              <button onclick="handleGame2Select(${item.id}, 'bad')" ${answered ? 'disabled' : ''} class="p-3 rounded-xl border-2 text-left text-xs font-bold transition-all flex items-center justify-between ${badStyle}">
+                <span>${item.badAction}</span>
+                ${answered === 'bad' ? '<i class="fa-solid fa-circle-xmark text-white"></i>' : ''}
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('game2-container').innerHTML = html;
+    }
+
+    function handleGame2Select(id, choice) {
+      if (game2Answers[id]) return;
+      game2Answers[id] = choice;
+
+      if (choice === 'good') {
+        playSound('correct');
+        game2Score++;
+      } else {
+        playSound('wrong');
+      }
+
+      renderGame2();
+
+      if (Object.keys(game2Answers).length === game2Items.length) {
+        if (game2Score === game2Items.length) {
+          setTimeout(() => {
+            playSound('win');
+            addStars(3);
+            document.getElementById('game2-success-card').classList.remove('hidden');
+          }, 300);
+        }
+      }
+    }
+
+    function resetGame2() {
+      game2Answers = {};
+      game2Score = 0;
+      document.getElementById('game2-success-card').classList.add('hidden');
+      renderGame2();
+    }
+
+    // --- KUIS INTERAKTIF LOGIC ---
+    const quizQuestions = [
+      {
+        q: "Menurut Amsal 17:17, seorang sahabat menaruh kasih pada saat...",
+        options: ["Saat senang saja", "Setiap waktu", "Saat diberi hadiah saja", "Saat dipuji"],
+        answer: 1
+      },
+      {
+        q: "Manusia disebut makhluk sosial artinya...",
+        options: [
+          "Manusia bisa hidup sendiri tanpa bantuan",
+          "Manusia suka tinggal di hutan",
+          "Manusia selalu membutuhkan orang lain",
+          "Manusia tidak butuh teman"
+        ],
+        answer: 2
+      },
+      {
+        q: "Di kota manakah Yesus mengajar saat 4 sahabat membongkar atap?",
+        options: ["Yerusalem", "Kapernaum", "Nazaret", "Betlehem"],
+        answer: 1
+      },
+      {
+        q: "Mengapa kerabat dan sahabat menurunkan si lumpuh dari atap rumah?",
+        options: [
+          "Karena pintu rumah sudah sangat penuh orang",
+          "Karena mereka ingin bermain tali",
+          "Karena rumahnya tidak memiliki pintu",
+          "Karena disuruh oleh pemilik rumah"
+        ],
+        answer: 0
+      },
+      {
+        q: "Bagaimana cara kita mengasihi teman di sekolah?",
+        options: [
+          "Hanya memilih teman yang kaya saja",
+          "Saling menolong, mendoakan, dan tidak membeda-bedakan",
+          "Memusuhi teman yang berbeda agama",
+          "Mengejek teman yang sedang sedih"
+        ],
+        answer: 1
+      }
+    ];
+
+    let currentQuizIndex = 0;
+    let selectedQuizOpt = null;
+    let quizUserAnswers = [];
+
+    function renderQuizQuestion() {
+      const q = quizQuestions[currentQuizIndex];
+      document.getElementById('quiz-progress-text').innerText = `Soal ${currentQuizIndex + 1} / ${quizQuestions.length}`;
+      document.getElementById('quiz-progress-bar').style.width = `${((currentQuizIndex + 1) / quizQuestions.length) * 100}%`;
+      document.getElementById('quiz-question-text').innerText = q.q;
+
+      let optsHtml = '';
+      q.options.forEach((opt, idx) => {
+        const isSelected = selectedQuizOpt === idx;
+        const btnStyle = isSelected
+          ? 'bg-purple-600 text-white border-purple-700 shadow-md transform scale-[1.01]'
+          : 'bg-white hover:bg-purple-50 text-slate-800 border-purple-200';
+
+        optsHtml += `
+          <button onclick="selectQuizOption(${idx})" class="w-full text-left p-4 rounded-2xl border-2 font-bold text-xs sm:text-sm transition-all flex items-center justify-between ${btnStyle}">
+            <span>${opt}</span>
+            ${isSelected ? '<i class="fa-solid fa-circle-check text-white"></i>' : ''}
+          </button>
+        `;
+      });
+      document.getElementById('quiz-options-list').innerHTML = optsHtml;
+
+      const btnNext = document.getElementById('btn-quiz-next');
+      if (selectedQuizOpt === null) {
+        btnNext.disabled = true;
+        btnNext.className = "px-6 py-3 rounded-full font-black text-sm flex items-center gap-2 transition-all bg-slate-200 text-slate-400 cursor-not-allowed";
+      } else {
+        btnNext.disabled = false;
+        btnNext.className = "px-6 py-3 rounded-full font-black text-sm flex items-center gap-2 transition-all bg-purple-600 hover:bg-purple-700 text-white shadow-lg";
+      }
+
+      btnNext.innerText = (currentQuizIndex + 1 === quizQuestions.length) ? 'Selesai & Lihat Hasil 🏆' : 'Pertanyaan Berikutnya ➡️';
+    }
+
+    function selectQuizOption(idx) {
+      playSound('click');
+      selectedQuizOpt = idx;
+      renderQuizQuestion();
+    }
+
+    function nextQuizQuestion() {
+      if (selectedQuizOpt === null) return;
+
+      const isCorrect = selectedQuizOpt === quizQuestions[currentQuizIndex].answer;
+      if (isCorrect) playSound('correct');
+      else playSound('wrong');
+
+      quizUserAnswers.push({ question: currentQuizIndex, selected: selectedQuizOpt, isCorrect });
+
+      if (currentQuizIndex + 1 < quizQuestions.length) {
+        currentQuizIndex++;
+        selectedQuizOpt = null;
+        renderQuizQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      playSound('win');
+      const correctCount = quizUserAnswers.filter(a => a.isCorrect).length;
+      const score = Math.round((correctCount / quizQuestions.length) * 100);
+
+      document.getElementById('quiz-screen-play').classList.add('hidden');
+      document.getElementById('quiz-screen-result').classList.remove('hidden');
+
+      document.getElementById('quiz-score-val').innerText = score;
+
+      let feedback = "Sempurna! Kamu memahami firman Tuhan tentang persahabatan dengan sangat baik! 🌟";
+      if (score < 100 && score >= 60) feedback = "Bagus sekali! Kamu sudah jadi teman yang hebat! Teruskan ya! 👍";
+      if (score < 60) feedback = "Tetap semangat! Yuk baca kembali materinya dan coba lagi! 💪";
+      document.getElementById('quiz-score-feedback').innerText = feedback;
+
+      const earnedStars = correctCount * 2;
+      addStars(earnedStars);
+      document.getElementById('quiz-stars-earned').innerHTML = `<i class="fa-solid fa-star text-amber-700"></i><span>+${earnedStars} Bintang Ditambahkan!</span>`;
+    }
+
+    function resetQuiz() {
+      currentQuizIndex = 0;
+      selectedQuizOpt = null;
+      quizUserAnswers = [];
+      document.getElementById('quiz-screen-result').classList.add('hidden');
+      document.getElementById('quiz-screen-play').classList.remove('hidden');
+      renderQuizQuestion();
+    }
+
+    // --- DOA & JANJI AFIRMASI LOGIC ---
+    function toggleCommitButton() {
+      const chk = document.getElementById('chk-pledge').checked;
+      const cName = document.getElementById('input-child-name').value.trim();
+      const fName = document.getElementById('input-friend-name').value.trim();
+      const btn = document.getElementById('btn-submit-badge');
+
+      if (chk && cName && fName) {
+        btn.disabled = false;
+        btn.className = "w-full py-3 rounded-full font-black text-xs transition-all shadow-md bg-rose-500 hover:bg-rose-600 text-white cursor-pointer";
+      } else {
+        btn.disabled = true;
+        btn.className = "w-full py-3 rounded-full font-black text-xs transition-all shadow-md bg-slate-200 text-slate-400 cursor-not-allowed";
+      }
+    }
+
+    document.getElementById('input-child-name').addEventListener('input', toggleCommitButton);
+    document.getElementById('input-friend-name').addEventListener('input', toggleCommitButton);
+
+    function handleBadgeSubmit(e) {
+      e.preventDefault();
+      const cName = document.getElementById('input-child-name').value.trim();
+      const fName = document.getElementById('input-friend-name').value.trim();
+
+      if (!cName || !fName) return;
+
+      playSound('win');
+      addStars(5);
+
+      document.getElementById('res-child-name').innerText = cName;
+      document.getElementById('res-friend-name').innerText = fName;
+
+      document.getElementById('badge-form-container').classList.add('hidden');
+      document.getElementById('badge-result-container').classList.remove('hidden');
+    }
+
+    // --- INITIAL RENDER ON LOAD ---
+    window.onload = function() {
+      renderStoryPage();
+      renderGame2();
+      renderQuizQuestion();
+    };
+  </script>
+</body>
+</html>
