@@ -1,0 +1,995 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Heart, Star, BookOpen, Gamepad2, Award, Sparkles, Volume2, VolumeX, 
+  CheckCircle2, XCircle, ChevronRight, ChevronLeft, RefreshCw, Trophy,
+  Users, Home, Smile, HelpCircle, ArrowDown, Gift, ShieldCheck
+} from 'lucide-react';
+
+// --- Web Audio Helper for Sound Effects ---
+const playSound = (type) => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (type === 'correct') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+      osc.frequency.exponentialRampToValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+      osc.frequency.exponentialRampToValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.35);
+    } else if (type === 'wrong') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(250, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.25);
+    } else if (type === 'win') {
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, idx) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(0.25, ctx.currentTime + idx * 0.1);
+        g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + idx * 0.1 + 0.2);
+        o.start(ctx.currentTime + idx * 0.1);
+        o.stop(ctx.currentTime + idx * 0.1 + 0.25);
+      });
+    } else if (type === 'click') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(400, ctx.currentTime);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.08);
+    }
+  } catch (e) {
+    // Audio context not allowed or supported without user gesture
+  }
+};
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('cerita');
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [totalStars, setTotalStars] = useState(0);
+
+  // Audio trigger wrapper
+  const triggerSound = (type) => {
+    if (soundEnabled) playSound(type);
+  };
+
+  // Text-to-Speech synthesis for kids
+  const speakText = (text) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'id-ID';
+      utterance.rate = 0.9;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-sky-100 via-amber-50 to-purple-100 text-slate-800 font-sans pb-12">
+      {/* HEADER NAVBAR */}
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-md border-b-4 border-yellow-400">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="bg-yellow-400 p-2.5 rounded-2xl shadow-inner transform hover:rotate-6 transition-transform">
+              <Sparkles className="w-7 h-7 text-amber-900" />
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-black text-sky-700 tracking-wide flex items-center gap-2">
+                Sahabat Sejati 🤝
+              </h1>
+              <p className="text-xs font-bold text-amber-600">Pendidikan Agama Kristen - Kelas 2 SD</p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            {/* Stars counter */}
+            <div className="bg-amber-100 border-2 border-amber-300 px-3 py-1.5 rounded-full flex items-center space-x-1.5 shadow-sm">
+              <Star className="w-5 h-5 text-yellow-500 fill-yellow-400 animate-pulse" />
+              <span className="font-extrabold text-amber-800 text-lg">{totalStars}</span>
+            </div>
+
+            {/* Sound Toggle */}
+            <button
+              onClick={() => {
+                setSoundEnabled(!soundEnabled);
+                triggerSound('click');
+              }}
+              className={`p-2 rounded-full border-2 transition-all ${
+                soundEnabled ? 'bg-emerald-100 border-emerald-400 text-emerald-700' : 'bg-rose-100 border-rose-300 text-rose-600'
+              }`}
+              title="Toggle Suara"
+            >
+              {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* NAVIGATION TABS */}
+        <nav className="max-w-5xl mx-auto px-2 flex justify-around sm:justify-center sm:space-x-4 py-2 overflow-x-auto no-scrollbar">
+          {[
+            { id: 'cerita', label: '📖 Cerita', color: 'hover:bg-sky-100 text-sky-700 border-sky-400', active: 'bg-sky-500 text-white shadow-md' },
+            { id: 'game1', label: '🎮 Turunkan Atap', color: 'hover:bg-amber-100 text-amber-700 border-amber-400', active: 'bg-amber-500 text-white shadow-md' },
+            { id: 'game2', label: '🧩 Cari Teman', color: 'hover:bg-emerald-100 text-emerald-700 border-emerald-400', active: 'bg-emerald-500 text-white shadow-md' },
+            { id: 'kuis', label: '📝 Kuis Seru', color: 'hover:bg-purple-100 text-purple-700 border-purple-400', active: 'bg-purple-600 text-white shadow-md' },
+            { id: 'afirmasi', label: '❤️ Doa & Janji', color: 'hover:bg-rose-100 text-rose-700 border-rose-400', active: 'bg-rose-500 text-white shadow-md' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                triggerSound('click');
+              }}
+              className={`px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-black transition-all border-2 flex-shrink-0 flex items-center gap-1.5 ${
+                activeTab === tab.id ? tab.active : `bg-white ${tab.color}`
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </header>
+
+      {/* MAIN CONTAINER */}
+      <main className="max-w-4xl mx-auto px-4 mt-6">
+        {activeTab === 'cerita' && <SectionCerita speakText={speakText} triggerSound={triggerSound} />}
+        {activeTab === 'game1' && <SectionGameAtap setTotalStars={setTotalStars} triggerSound={triggerSound} />}
+        {activeTab === 'game2' && <SectionGameMatching setTotalStars={setTotalStars} triggerSound={triggerSound} />}
+        {activeTab === 'kuis' && <SectionKuis setTotalStars={setTotalStars} triggerSound={triggerSound} />}
+        {activeTab === 'afirmasi' && <SectionAfirmasi setTotalStars={setTotalStars} triggerSound={triggerSound} />}
+      </main>
+
+      {/* FOOTER */}
+      <footer className="mt-12 text-center text-xs font-bold text-slate-500">
+        <p>Pendidikan Agama Kristen & Budi Pekerti - Kelas 2 SD</p>
+        <p className="mt-1 text-slate-400">Dibuat dengan ❤️ untuk pembelajaran interaktif anak-anak</p>
+      </footer>
+    </div>
+  );
+}
+
+/* =========================================================================
+   TAB 1: CERITA & MATERI INTERAKTIF
+========================================================================= */
+function SectionCerita({ speakText, triggerSound }) {
+  const [activeStoryPage, setActiveStoryPage] = useState(0);
+
+  const pages = [
+    {
+      title: "Ayat Hafalan Hari Ini 📜",
+      content: (
+        <div className="space-y-4 text-center">
+          <div className="bg-amber-100 border-4 border-amber-300 p-6 rounded-3xl shadow-lg relative">
+            <span className="text-4xl absolute -top-5 left-6">✨</span>
+            <span className="text-4xl absolute -bottom-5 right-6">✨</span>
+            <h3 className="text-lg font-black text-amber-900 mb-2">Amsal 17:17</h3>
+            <p className="text-xl sm:text-2xl font-bold text-amber-800 italic leading-relaxed">
+              "Seorang sahabat menaruh kasih setiap waktu, dan menjadi seorang saudara dalam kesukaran."
+            </p>
+            <button
+              onClick={() => {
+                triggerSound('click');
+                speakText("Amsal 17 ayat 17. Seorang sahabat menaruh kasih setiap waktu, dan menjadi seorang saudara dalam kesukaran.");
+              }}
+              className="mt-4 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-full font-bold text-sm shadow flex items-center justify-center gap-2 mx-auto"
+            >
+              <Volume2 className="w-4 h-4" /> Dengarkan Ayat
+            </button>
+          </div>
+
+          <div className="bg-sky-50 p-5 rounded-2xl border-2 border-sky-200 text-left">
+            <h4 className="font-extrabold text-sky-800 text-base mb-1 flex items-center gap-2">
+              <Users className="w-5 h-5 text-sky-600" /> Manusia Adalah Makhluk Sosial
+            </h4>
+            <p className="text-sm leading-relaxed text-slate-700">
+              Artinya, <strong>kita tidak dapat hidup sendirian</strong>! Di rumah kita butuh Orang Tua dan Saudara. Di sekolah dan lingkungan masyarakat, kita butuh teman-teman yang baik.
+            </p>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Kisah 4 Sahabat & Orang Lumpuh 🏠",
+      subtitle: "(Lukas 5:19-20)",
+      content: (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            {/* SVG Illustration of Roof Lowering */}
+            <div className="bg-gradient-to-b from-sky-200 to-amber-100 p-4 rounded-3xl border-4 border-sky-300 flex flex-col items-center justify-center min-h-[220px]">
+              <svg className="w-48 h-48" viewBox="0 0 200 200">
+                {/* Roof structure */}
+                <polygon points="20,80 100,20 180,80" fill="#d97706" />
+                <polygon points="40,80 100,35 160,80" fill="#f59e0b" />
+                {/* Hole in roof */}
+                <ellipse cx="100" cy="70" rx="35" ry="15" fill="#451a03" />
+                {/* Ropes */}
+                <line x1="75" y1="70" x2="75" y2="135" stroke="#78350f" strokeWidth="3" strokeDasharray="4 2" />
+                <line x1="125" y1="70" x2="125" y2="135" stroke="#78350f" strokeWidth="3" strokeDasharray="4 2" />
+                {/* Bed / Mat */}
+                <rect x="65" y="130" width="70" height="15" rx="5" fill="#3b82f6" />
+                {/* Paralytic person */}
+                <circle cx="80" cy="132" r="6" fill="#fca5a5" />
+                <rect x="85" y="133" width="30" height="7" rx="3" fill="#ef4444" />
+                {/* Jesus below */}
+                <circle cx="100" cy="170" r="10" fill="#fde047" />
+                <path d="M 90 190 Q 100 175 110 190 Z" fill="#ffffff" stroke="#eab308" strokeWidth="2" />
+              </svg>
+              <p className="text-xs font-bold text-amber-900 mt-2 bg-white/80 px-3 py-1 rounded-full">
+                Menurunkan tempat tidur dari atap rumah!
+              </p>
+            </div>
+
+            <div className="space-y-3 text-sm leading-relaxed text-slate-700">
+              <div className="bg-amber-50 p-3 rounded-xl border border-amber-200">
+                <span className="font-black text-amber-700">1. Kota Kapernaum:</span> Rumah tempat Yesus mengajar sangat dipenuhi banyak orang. Tidak ada jalan masuk lewat pintu atau jendela!
+              </div>
+              <div className="bg-sky-50 p-3 rounded-xl border border-sky-200">
+                <span className="font-black text-sky-700">2. Kerja Sama Luar Biasa:</span> Empat orang sahabat tidak menyerah! Mereka memanjat ke atas atap, membongkar genteng, dan menurunkan si sakit lumpuh beserta tempat tidurnya dengan tali.
+              </div>
+              <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+                <span className="font-black text-emerald-700">3. Yesus Mengagumi Iman Mereka:</span> Yesus berkata, <em>"Hai saudara, dosamu sudah diampuni... Bangunlah, angkatlah tilammu dan pulanglah!"</em>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Pelajaran Penting Untuk Kita 🌟",
+      content: (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="bg-purple-50 border-2 border-purple-200 p-4 rounded-2xl flex items-start space-x-3">
+            <div className="bg-purple-500 text-white p-2.5 rounded-2xl font-black text-lg">A</div>
+            <div>
+              <h4 className="font-extrabold text-purple-900 text-base">Saling Menolong</h4>
+              <p className="text-xs text-purple-800 mt-1 leading-relaxed">
+                Tuhan memberikan teman agar kita bisa saling membantu, saling mendoakan saat sakit, menghibur saat sedih, dan belajar bersama.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-rose-50 border-2 border-rose-200 p-4 rounded-2xl flex items-start space-x-3">
+            <div className="bg-rose-500 text-white p-2.5 rounded-2xl font-black text-lg">B</div>
+            <div>
+              <h4 className="font-extrabold text-rose-900 text-base">Meneladani Yesus</h4>
+              <p className="text-xs text-rose-800 mt-1 leading-relaxed">
+                Tuhan Yesus adalah Sahabat sejati terbaik kita. Kita dipanggil untuk mengasihi teman tanpa membeda-bedakan agama atau status sosial.
+              </p>
+            </div>
+          </div>
+
+          <div className="col-span-1 sm:col-span-2 bg-yellow-100 border-2 border-yellow-300 p-4 rounded-2xl flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Gift className="w-8 h-8 text-amber-600 flex-shrink-0" />
+              <p className="text-xs sm:text-sm font-bold text-amber-900">
+                Kehadiran teman adalah bukti nyata bahwa Tuhan memelihara dan menyayangi hidup kita!
+              </p>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  ];
+
+  return (
+    <div className="bg-white rounded-3xl p-6 shadow-xl border-4 border-sky-200">
+      <div className="flex items-center justify-between mb-4 pb-2 border-b-2 border-slate-100">
+        <div>
+          <h2 className="text-xl font-black text-sky-800">{pages[activeStoryPage].title}</h2>
+          {pages[activeStoryPage].subtitle && (
+            <span className="text-xs font-bold text-sky-600">{pages[activeStoryPage].subtitle}</span>
+          )}
+        </div>
+        <span className="text-xs font-black bg-sky-100 text-sky-700 px-3 py-1 rounded-full">
+          Halaman {activeStoryPage + 1} / {pages.length}
+        </span>
+      </div>
+
+      <div className="min-h-[260px] flex flex-col justify-center">
+        {pages[activeStoryPage].content}
+      </div>
+
+      {/* Pagination controls */}
+      <div className="flex items-center justify-between mt-6 pt-4 border-t-2 border-slate-100">
+        <button
+          disabled={activeStoryPage === 0}
+          onClick={() => {
+            setActiveStoryPage(prev => prev - 1);
+            triggerSound('click');
+          }}
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm ${
+            activeStoryPage === 0
+              ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              : 'bg-sky-500 text-white hover:bg-sky-600 shadow'
+          }`}
+        >
+          <ChevronLeft className="w-4 h-4" /> Sebelum
+        </button>
+
+        <div className="flex space-x-2">
+          {pages.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                setActiveStoryPage(idx);
+                triggerSound('click');
+              }}
+              className={`w-3 h-3 rounded-full transition-all ${
+                activeStoryPage === idx ? 'bg-sky-600 w-6' : 'bg-slate-200'
+              }`}
+            />
+          ))}
+        </div>
+
+        <button
+          disabled={activeStoryPage === pages.length - 1}
+          onClick={() => {
+            setActiveStoryPage(prev => prev + 1);
+            triggerSound('click');
+          }}
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-sm ${
+            activeStoryPage === pages.length - 1
+              ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+              : 'bg-sky-500 text-white hover:bg-sky-600 shadow'
+          }`}
+        >
+          Berikut <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   TAB 2: MINI GAME 1 - TURUNKAN ATAP (Interactive Rope Lowering Game)
+========================================================================= */
+function SectionGameAtap({ setTotalStars, triggerSound }) {
+  const [ropeLength, setRopeLength] = useState(0); // 0 (roof top) to 100 (ground/Jesus)
+  const [gameState, setGameState] = useState('start'); // 'start', 'playing', 'won'
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const steps = [
+    {
+      question: "Berapa orang sahabat yang bekerja sama membawa orang lumpuh ini?",
+      options: ["2 orang", "4 orang", "10 orang"],
+      correct: 1,
+      hint: "Mereka berempat kompak membawa tilam dari 4 sisi!"
+    },
+    {
+      question: "Mengapa mereka harus membongkar atap rumah?",
+      options: [
+        "Karena pintu & jendela sudah penuh orang",
+        "Karena mereka suka main di atap",
+        "Karena pintu sedang terkunci"
+      ],
+      correct: 0,
+      hint: "Banyak orang berdesakan mendengar ajaran Yesus."
+    },
+    {
+      question: "Apa reaksi Yesus ketika melihat usaha keras 4 sahabat ini?",
+      options: [
+        "Yesus marah karena atap rusak",
+        "Yesus kagum akan iman mereka",
+        "Yesus menyuruh mereka pulang"
+      ],
+      correct: 1,
+      hint: "Yesus melihat kasih & iman yang luar biasa dari para sahabat!"
+    }
+  ];
+
+  const handleAnswer = (index) => {
+    if (index === steps[currentStep].correct) {
+      triggerSound('correct');
+      const nextRope = ropeLength + 33.3;
+      setRopeLength(nextRope);
+
+      if (currentStep + 1 < steps.length) {
+        setCurrentStep(prev => prev + 1);
+      } else {
+        triggerSound('win');
+        setGameState('won');
+        setTotalStars(prev => prev + 3);
+      }
+    } else {
+      triggerSound('wrong');
+    }
+  };
+
+  const restartGame = () => {
+    setRopeLength(0);
+    setCurrentStep(0);
+    setGameState('playing');
+  };
+
+  return (
+    <div className="bg-white rounded-3xl p-6 shadow-xl border-4 border-amber-300">
+      <div className="text-center mb-4">
+        <h2 className="text-2xl font-black text-amber-900 flex items-center justify-center gap-2">
+          🎮 Misi Sahabat: Turunkan Tempat Tidur!
+        </h2>
+        <p className="text-xs text-amber-700 font-bold mt-1">
+          Bantu 4 sahabat menurunkan teman yang lumpuh tepat di depan Yesus dengan menjawab pertanyaan!
+        </p>
+      </div>
+
+      {gameState === 'start' && (
+        <div className="text-center py-8 space-y-4">
+          <div className="bg-amber-50 p-6 rounded-3xl border-2 border-amber-200 max-w-md mx-auto">
+            <span className="text-5xl block mb-2">🪜</span>
+            <h3 className="font-extrabold text-amber-900 text-lg">Siap Membantu Teman?</h3>
+            <p className="text-xs text-amber-800 mt-2 leading-relaxed">
+              Setiap jawaban yang benar akan mengulur tali tempat tidur makin turun ke bawah hingga sampai kepada Yesus.
+            </p>
+            <button
+              onClick={() => {
+                setGameState('playing');
+                triggerSound('click');
+              }}
+              className="mt-6 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white text-base font-black rounded-full shadow-lg transform hover:scale-105 transition-all"
+            >
+              Mulai Permainan 🚀
+            </button>
+          </div>
+        </div>
+      )}
+
+      {gameState === 'playing' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+          {/* Visual animation canvas */}
+          <div className="bg-gradient-to-b from-sky-200 via-amber-100 to-amber-200 p-4 rounded-3xl border-4 border-amber-400 relative overflow-hidden h-72 flex flex-col justify-between items-center shadow-inner">
+            {/* Top Roof */}
+            <div className="w-full bg-amber-700 h-8 rounded-t-xl flex justify-center items-center relative border-b-4 border-amber-900">
+              <span className="text-xs text-white font-black">ATAP RUMAH KAPERNALUM</span>
+              {/* Hole in the roof */}
+              <div className="absolute top-1 bg-amber-950 w-24 h-6 rounded-full border border-amber-600"></div>
+            </div>
+
+            {/* Rope and Bed Container */}
+            <div
+              className="w-full flex flex-col items-center transition-all duration-700 ease-out"
+              style={{ transform: `translateY(${ropeLength * 1.5}px)` }}
+            >
+              {/* Ropes */}
+              <div className="flex justify-between w-32 h-16 border-x-4 border-amber-800 border-dashed" />
+              {/* Bed & Friend */}
+              <div className="bg-sky-500 text-white font-black text-xs px-4 py-2 rounded-2xl shadow-lg border-2 border-white flex items-center space-x-2 animate-bounce">
+                <span>🛏️</span>
+                <span>Teman Lumpuh</span>
+              </div>
+            </div>
+
+            {/* Bottom: Lord Jesus */}
+            <div className="w-full bg-emerald-600/30 p-2 rounded-b-xl flex flex-col items-center border-t-2 border-emerald-400">
+              <div className="bg-white px-3 py-1 rounded-full border border-yellow-400 shadow text-xs font-black text-amber-800 flex items-center gap-1">
+                <span>✨</span> Tuhan Yesus Menyembuhkan
+              </div>
+            </div>
+          </div>
+
+          {/* Question Box */}
+          <div className="space-y-4">
+            <div className="bg-amber-50 p-4 rounded-2xl border-2 border-amber-300">
+              <span className="text-xs font-black bg-amber-200 text-amber-800 px-2.5 py-1 rounded-full">
+                Pertanyaan {currentStep + 1} dari 3
+              </span>
+              <h4 className="font-extrabold text-amber-950 text-base mt-2">
+                {steps[currentStep].question}
+              </h4>
+            </div>
+
+            <div className="space-y-2">
+              {steps[currentStep].options.map((opt, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleAnswer(idx)}
+                  className="w-full text-left p-3.5 bg-white hover:bg-amber-100 border-2 border-amber-200 hover:border-amber-400 rounded-2xl font-bold text-xs sm:text-sm text-slate-800 transition-all shadow-sm flex items-center justify-between group"
+                >
+                  <span>{opt}</span>
+                  <ChevronRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
+                </button>
+              ))}
+            </div>
+
+            <div className="text-xs text-amber-700 italic bg-white p-2.5 rounded-xl border border-amber-100">
+              💡 Petunjuk: {steps[currentStep].hint}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {gameState === 'won' && (
+        <div className="text-center py-6 space-y-4 animate-fade-in">
+          <div className="bg-emerald-50 p-6 rounded-3xl border-4 border-emerald-300 max-w-md mx-auto shadow-lg">
+            <div className="text-6xl mb-2">🎉✨</div>
+            <h3 className="text-2xl font-black text-emerald-900">HEBAT SEKALI!</h3>
+            <p className="text-xs font-bold text-emerald-800 mt-2 leading-relaxed">
+              Kamu berhasil membantu 4 sahabat menurunkan teman mereka! Yesus menyembuhkan si lumpuh dan dia dapat berjalan kembali dengan sukacita!
+            </p>
+            <div className="mt-4 inline-flex items-center space-x-2 bg-yellow-300 border-2 border-yellow-500 px-4 py-2 rounded-full font-black text-amber-900 text-sm">
+              <Star className="w-5 h-5 fill-amber-700" />
+              <span>+3 Bintang Sahabat Diterima!</span>
+            </div>
+            <br />
+            <button
+              onClick={restartGame}
+              className="mt-6 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-black text-sm shadow flex items-center gap-2 mx-auto"
+            >
+              <RefreshCw className="w-4 h-4" /> Main Lagi
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* =========================================================================
+   TAB 3: MINI GAME 2 - PASANGKAN PERBUATAN SAHABAT
+========================================================================= */
+function SectionGameMatching({ setTotalStars, triggerSound }) {
+  const [score, setScore] = useState(0);
+  const [completed, setCompleted] = useState(false);
+
+  const items = [
+    {
+      id: 1,
+      situation: "Teman sedang sakit dirawat di rumah",
+      goodAction: "Menjenguk dan mendoakan kesembuhannya",
+      badAction: "Membiarkan dan meninggalkannya sendirian",
+    },
+    {
+      id: 2,
+      situation: "Teman sedang bersedih atau menangis",
+      goodAction: "Menghibur dan mendengarkan ceritanya",
+      badAction: "Ejek dan tertawa terbahak-bahak",
+    },
+    {
+      id: 3,
+      situation: "Teman kesulitan belajar materi kelas",
+      goodAction: "Belajar bersama dan saling membantu",
+      badAction: "Pelit ilmu dan tidak mau bantu",
+    },
+    {
+      id: 4,
+      situation: "Teman berbeda agama atau suku",
+      goodAction: "Tetap berteman baik dan saling menghormati",
+      badAction: "Jauhi dan hanya berteman yang sama saja",
+    }
+  ];
+
+  const [answers, setAnswers] = useState({});
+
+  const handleSelect = (itemId, choice) => {
+    if (answers[itemId]) return; // process only once per item
+
+    const isCorrect = choice === 'good';
+    setAnswers(prev => ({ ...prev, [itemId]: choice }));
+
+    if (isCorrect) {
+      triggerSound('correct');
+      const newScore = score + 1;
+      setScore(newScore);
+
+      if (newScore === items.length) {
+        triggerSound('win');
+        setCompleted(true);
+        setTotalStars(prev => prev + 3);
+      }
+    } else {
+      triggerSound('wrong');
+    }
+  };
+
+  const resetGame = () => {
+    setAnswers({});
+    setScore(0);
+    setCompleted(false);
+  };
+
+  return (
+    <div className="bg-white rounded-3xl p-6 shadow-xl border-4 border-emerald-300">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-black text-emerald-900 flex items-center justify-center gap-2">
+          🧩 Pilih Perbuatan Sahabat Sejati
+        </h2>
+        <p className="text-xs text-emerald-700 font-bold mt-1">
+          Pilih sikap anak Tuhan yang benar untuk setiap situasi di bawah ini!
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        {items.map((item) => {
+          const isAnswered = answers[item.id];
+          return (
+            <div key={item.id} className="bg-emerald-50/60 p-4 rounded-2xl border-2 border-emerald-200 space-y-3">
+              <div className="flex items-center space-x-2">
+                <span className="bg-emerald-500 text-white w-6 h-6 rounded-full flex items-center justify-center font-extrabold text-xs">
+                  {item.id}
+                </span>
+                <h4 className="font-extrabold text-slate-800 text-sm">{item.situation}</h4>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Option Good */}
+                <button
+                  onClick={() => handleSelect(item.id, 'good')}
+                  disabled={!!isAnswered}
+                  className={`p-3 rounded-xl border-2 text-left text-xs font-bold transition-all flex items-center justify-between ${
+                    isAnswered === 'good'
+                      ? 'bg-emerald-500 text-white border-emerald-600 shadow'
+                      : isAnswered
+                      ? 'bg-slate-100 text-slate-400 border-slate-200'
+                      : 'bg-white hover:bg-emerald-100 text-emerald-900 border-emerald-300'
+                  }`}
+                >
+                  <span>{item.goodAction}</span>
+                  {isAnswered === 'good' && <CheckCircle2 className="w-5 h-5 text-white flex-shrink-0" />}
+                </button>
+
+                {/* Option Bad */}
+                <button
+                  onClick={() => handleSelect(item.id, 'bad')}
+                  disabled={!!isAnswered}
+                  className={`p-3 rounded-xl border-2 text-left text-xs font-bold transition-all flex items-center justify-between ${
+                    isAnswered === 'bad'
+                      ? 'bg-rose-500 text-white border-rose-600 shadow'
+                      : isAnswered
+                      ? 'bg-slate-100 text-slate-400 border-slate-200'
+                      : 'bg-white hover:bg-rose-100 text-rose-900 border-rose-200'
+                  }`}
+                >
+                  <span>{item.badAction}</span>
+                  {isAnswered === 'bad' && <XCircle className="w-5 h-5 text-white flex-shrink-0" />}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {completed && (
+        <div className="mt-6 p-5 bg-gradient-to-r from-emerald-400 to-teal-500 text-white rounded-2xl text-center shadow-lg animate-bounce">
+          <h3 className="text-xl font-black">Luar Biasa! Kamu Adalah Sahabat yang Baik! 🌟</h3>
+          <p className="text-xs font-bold mt-1">Kamu berhasil memilih semua tindakan penuh kasih!</p>
+          <div className="mt-3 inline-flex items-center space-x-2 bg-white text-emerald-800 px-4 py-1.5 rounded-full font-black text-xs">
+            <Star className="w-4 h-4 fill-yellow-400 text-yellow-500" />
+            <span>+3 Bintang Diterima</span>
+          </div>
+          <button
+            onClick={resetGame}
+            className="block mx-auto mt-4 px-5 py-2 bg-white text-emerald-700 hover:bg-emerald-50 font-black rounded-full text-xs shadow"
+          >
+            Coba Lagi
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* =========================================================================
+   TAB 4: KUIS INTERAKTIF (5 Questions + Scoring)
+========================================================================= */
+function SectionKuis({ setTotalStars, triggerSound }) {
+  const [currentQ, setCurrentQ] = useState(0);
+  const [selectedOpt, setSelectedOpt] = useState(null);
+  const [userAnswers, setUserAnswers] = useState([]);
+  const [isFinished, setIsFinished] = useState(false);
+
+  const questions = [
+    {
+      q: "Menurut Amsal 17:17, seorang sahabat menaruh kasih pada saat...",
+      options: ["Saat senang saja", "Setiap waktu", "Saat diberi hadiah saja", "Saat dipuji"],
+      answer: 1
+    },
+    {
+      q: "Manusia disebut makhluk sosial artinya...",
+      options: [
+        "Manusia bisa hidup sendiri tanpa bantuan",
+        "Manusia suka tinggal di hutan",
+        "Manusia selalu membutuhkan orang lain",
+        "Manusia tidak butuh teman"
+      ],
+      answer: 2
+    },
+    {
+      q: "Di kota manakah Yesus mengajar saat 4 sahabat membongkar atap?",
+      options: ["Yerusalem", "Kapernaum", "Nazaret", "Betlehem"],
+      answer: 1
+    },
+    {
+      q: "Mengapa kerabat dan sahabat menurunkan si lumpuh dari atap rumah?",
+      options: [
+        "Karena pintu rumah sudah sangat penuh orang",
+        "Karena mereka ingin bermain tali",
+        "Karena rumahnya tidak memiliki pintu",
+        "Karena disuruh oleh pemilik rumah"
+      ],
+      answer: 0
+    },
+    {
+      q: "Bagaimana cara kita mengasihi teman di sekolah?",
+      options: [
+        "Hanya memilih teman yang kaya saja",
+        "Saling menolong, mendoakan, dan tidak membeda-bedakan",
+        "Memusuhi teman yang berbeda agama",
+        "Mengejek teman yang sedang sedih"
+      ],
+      answer: 1
+    }
+  ];
+
+  const handleSelectOption = (index) => {
+    setSelectedOpt(index);
+    triggerSound('click');
+  };
+
+  const handleNext = () => {
+    if (selectedOpt === null) return;
+
+    const isCorrect = selectedOpt === questions[currentQ].answer;
+    if (isCorrect) triggerSound('correct');
+    else triggerSound('wrong');
+
+    const updatedAnswers = [...userAnswers, { question: currentQ, selected: selectedOpt, isCorrect }];
+    setUserAnswers(updatedAnswers);
+
+    if (currentQ + 1 < questions.length) {
+      setCurrentQ(currentQ + 1);
+      setSelectedOpt(null);
+    } else {
+      triggerSound('win');
+      setIsFinished(true);
+      const correctCount = updatedAnswers.filter(a => a.isCorrect).length;
+      setTotalStars(prev => prev + correctCount * 2);
+    }
+  };
+
+  const resetKuis = () => {
+    setCurrentQ(0);
+    setSelectedOpt(null);
+    setUserAnswers([]);
+    setIsFinished(false);
+  };
+
+  const calculateScore = () => {
+    const correctCount = userAnswers.filter(a => a.isCorrect).length;
+    return Math.round((correctCount / questions.length) * 100);
+  };
+
+  return (
+    <div className="bg-white rounded-3xl p-6 shadow-xl border-4 border-purple-300">
+      {!isFinished ? (
+        <div>
+          {/* Header quiz info */}
+          <div className="flex items-center justify-between mb-4 pb-2 border-b-2 border-slate-100">
+            <div>
+              <h2 className="text-xl font-black text-purple-900">📝 Kuis Sahabat Sejati</h2>
+              <p className="text-xs font-bold text-purple-600">Jawab pertanyaan berikut dengan teliti!</p>
+            </div>
+            <span className="text-xs font-black bg-purple-100 text-purple-700 px-3 py-1.5 rounded-full">
+              Soal {currentQ + 1} / {questions.length}
+            </span>
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden mb-6">
+            <div
+              className="bg-purple-600 h-full transition-all duration-300"
+              style={{ width: `${((currentQ + 1) / questions.length) * 100}%` }}
+            />
+          </div>
+
+          {/* Question content */}
+          <div className="bg-purple-50/60 p-5 rounded-2xl border-2 border-purple-200 mb-6">
+            <h3 className="text-base sm:text-lg font-black text-purple-950">
+              {questions[currentQ].q}
+            </h3>
+          </div>
+
+          {/* Options */}
+          <div className="space-y-3">
+            {questions[currentQ].options.map((opt, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleSelectOption(idx)}
+                className={`w-full text-left p-4 rounded-2xl border-2 font-bold text-xs sm:text-sm transition-all flex items-center justify-between ${
+                  selectedOpt === idx
+                    ? 'bg-purple-600 text-white border-purple-700 shadow-md transform scale-[1.01]'
+                    : 'bg-white hover:bg-purple-50 text-slate-800 border-purple-200'
+                }`}
+              >
+                <span>{opt}</span>
+                {selectedOpt === idx && <CheckCircle2 className="w-5 h-5 text-white" />}
+              </button>
+            ))}
+          </div>
+
+          {/* Submit/Next button */}
+          <div className="mt-6 flex justify-end">
+            <button
+              disabled={selectedOpt === null}
+              onClick={handleNext}
+              className={`px-6 py-3 rounded-full font-black text-sm flex items-center gap-2 transition-all ${
+                selectedOpt === null
+                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  : 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg'
+              }`}
+            >
+              {currentQ + 1 === questions.length ? 'Selesai & Lihat Hasil 🏆' : 'Pertanyaan Berikutnya ➡️'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* RESULT SCORE CARD */
+        <div className="text-center py-6 space-y-6">
+          <div className="bg-gradient-to-b from-purple-100 to-amber-50 p-6 rounded-3xl border-4 border-purple-300 shadow-lg max-w-md mx-auto">
+            <Trophy className="w-16 h-16 text-yellow-500 mx-auto animate-bounce" />
+            <h3 className="text-2xl font-black text-purple-900 mt-2">HASIL KUIS KAMU</h3>
+
+            <div className="my-4">
+              <span className="text-5xl font-black text-purple-700">{calculateScore()}</span>
+              <span className="text-sm font-bold text-purple-500"> / 100</span>
+            </div>
+
+            <p className="text-xs font-bold text-slate-600">
+              {calculateScore() === 100
+                ? "Sempurna! Kamu memahami firman Tuhan tentang persahabatan dengan sangat baik! 🌟"
+                : calculateScore() >= 60
+                ? "Bagus sekali! Kamu sudah jadi teman yang hebat! Teruskan ya! 👍"
+                : "Tetap semangat! Yuk baca kembali materinya dan coba lagi! 💪"}
+            </p>
+
+            <div className="mt-4 inline-flex items-center space-x-2 bg-yellow-300 border-2 border-yellow-500 px-4 py-2 rounded-full font-black text-amber-900 text-xs">
+              <Star className="w-4 h-4 fill-amber-700" />
+              <span>+{userAnswers.filter(a => a.isCorrect).length * 2} Bintang Ditambahkan!</span>
+            </div>
+
+            <div className="mt-6">
+              <button
+                onClick={resetKuis}
+                className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-full text-xs shadow flex items-center gap-2 mx-auto"
+              >
+                <RefreshCw className="w-4 h-4" /> Ulangi Kuis
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* =========================================================================
+   TAB 5: DOA & AFIRMASI
+========================================================================= */
+function SectionAfirmasi({ setTotalStars, triggerSound }) {
+  const [pledgeChecked, setPledgeChecked] = useState(false);
+  const [childName, setChildName] = useState('');
+  const [friendName, setFriendName] = useState('');
+  const [savedBadge, setSavedBadge] = useState(false);
+
+  const handleCommit = (e) => {
+    e.preventDefault();
+    if (!childName || !friendName) return;
+    triggerSound('win');
+    setSavedBadge(true);
+    setTotalStars(prev => prev + 5);
+  };
+
+  return (
+    <div className="bg-white rounded-3xl p-6 shadow-xl border-4 border-rose-300 space-y-6">
+      <div className="text-center">
+        <h2 className="text-2xl font-black text-rose-900 flex items-center justify-center gap-2">
+          ❤️ Afirmasi & Doa Sahabat
+        </h2>
+        <p className="text-xs text-rose-700 font-bold mt-1">
+          Mari kita berjanji untuk selalu mengasihi dan menolong teman dengan ikhlas.
+        </p>
+      </div>
+
+      {/* Affirmation Card */}
+      <div className="bg-gradient-to-r from-rose-100 via-pink-100 to-amber-100 p-6 rounded-3xl border-2 border-rose-300 shadow-sm relative">
+        <span className="text-3xl absolute top-3 left-3">🕊️</span>
+        <span className="text-3xl absolute bottom-3 right-3">✨</span>
+        <h3 className="text-center font-extrabold text-rose-900 text-base mb-3">AFIRMASI ANAK TUHAN</h3>
+        <p className="text-sm font-bold text-rose-800 text-center italic leading-relaxed max-w-xl mx-auto">
+          "Marilah kita selalu mengasihi dan menolong sesama teman, dengan dasar kasih yang tulus, ikhlas, dan tanpa mengharapkan balasan apa pun, karena Tuhan selalu melihat perbuatan baik kita."
+        </p>
+      </div>
+
+      {/* Interactive Prayer Badge Generator */}
+      <div className="bg-rose-50/70 p-5 rounded-2xl border-2 border-rose-200">
+        <h4 className="font-extrabold text-rose-950 text-sm mb-3 flex items-center gap-2">
+          <ShieldCheck className="w-5 h-5 text-rose-600" /> Cartas Janji Sahabat Sejati
+        </h4>
+
+        {!savedBadge ? (
+          <form onSubmit={handleCommit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-black text-rose-900 mb-1">Nama Kamu:</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Samuel"
+                  value={childName}
+                  onChange={(e) => setChildName(e.target.value)}
+                  className="w-full px-3 py-2 text-xs font-bold rounded-xl border-2 border-rose-300 focus:outline-none focus:border-rose-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-black text-rose-900 mb-1">Nama Sahabat Terbaikmu:</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Maria"
+                  value={friendName}
+                  onChange={(e) => setFriendName(e.target.value)}
+                  className="w-full px-3 py-2 text-xs font-bold rounded-xl border-2 border-rose-300 focus:outline-none focus:border-rose-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="pledge"
+                checked={pledgeChecked}
+                onChange={(e) => setPledgeChecked(e.target.checked)}
+                className="w-4 h-4 text-rose-600 rounded border-rose-300 focus:ring-rose-500"
+              />
+              <label htmlFor="pledge" className="text-xs font-bold text-slate-700">
+                Saya berjanji akan mengasihi, mendoakan, dan membantu sahabat saya setiap saat!
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              disabled={!pledgeChecked || !childName || !friendName}
+              className={`w-full py-3 rounded-full font-black text-xs transition-all shadow-md ${
+                !pledgeChecked || !childName || !friendName
+                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  : 'bg-rose-500 hover:bg-rose-600 text-white'
+              }`}
+            >
+              Simpan Janji & Dapatkan Lencana Sahabat 🎖️
+            </button>
+          </form>
+        ) : (
+          /* BADGE RESULT */
+          <div className="text-center p-6 bg-white rounded-2xl border-4 border-yellow-400 shadow-xl space-y-3 animate-fade-in">
+            <div className="inline-block bg-yellow-400 p-3 rounded-full shadow-md mb-1">
+              <Award className="w-10 h-10 text-amber-900" />
+            </div>
+            <h4 className="text-lg font-black text-amber-900">LENCANA SAHABAT SEJATI</h4>
+            <p className="text-xs font-extrabold text-slate-600">
+              Diberikan kepada <span className="text-rose-600 font-black">{childName}</span> karena berjanji menjadi sahabat yang penuh kasih untuk <span className="text-rose-600 font-black">{friendName}</span>.
+            </p>
+            <div className="p-3 bg-yellow-50 rounded-xl border border-yellow-200 text-xs italic text-amber-800 font-bold">
+              "Tuhan Yesus selalu melihat setiap perbuatan baik dan kasih tulusmu!"
+            </div>
+            <div className="pt-2">
+              <span className="text-xs font-black bg-rose-100 text-rose-700 px-3 py-1 rounded-full">
+                +5 Bintang Spesial Diterima! ⭐
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
